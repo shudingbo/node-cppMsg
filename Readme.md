@@ -1,0 +1,118 @@
+# HashMap Class for JavaScript
+
+## Installation
+
+Using npm:
+
+    $ npm install cppMsg
+
+You can download the last stable version from the [releases page](https://github.com/flesler/hashmap/releases).
+
+If you like risk, you can download the [latest master version](https://raw.github.com/flesler/hashmap/master/hashmap.js), it's usually stable.
+
+To run the tests:
+
+    $ node test.js
+
+## Description
+You can use this module, parse binary data from the c + +, can also be generate binary data(from json object) that c/c++ can phrase.
+This module provides follow function:
+  - Encode json data to binary data
+  - Decode binary data to json
+  - support more data type: int8/16/32/64, uint8/16/32, float,double,bool,string
+  - support msg nested;
+  
+  You can phrase C++ binary data sturct from network to json.
+  
+
+## cppMsg.msg constructor overloads
+- `new cppMsg.msg() create empty cppMsg;
+- `new cppMsg.msg( ds ) ds is data struct define Array
+- `new cppMsg.msg( ds, data) ds is data struct define Array. data(optional) is init json data. 
+
+## cppMsg.msg methods
+- encodeMsg( data ) : json data object;
+- decodeMsg( buf )  : decode Buffer to json data object; 
+
+next methods using stream mode:
+- push_uint8
+- push_int8
+- push_uint16
+- push_int16
+- push_uint32
+- push_int32
+- push_string
+- push_char
+- encode( data ) : data is json data stream.
+
+## Examples
+
+### Normal Mode
+Assume this for all examples below
+
+	var cppMsg = require('./cppMsg.js');
+
+	var msg_def = {
+		msgHead:[
+					['mainType','int32'],
+					['subType', 'int32']
+				]
+	};
+
+
+	var msg = new cppMsg.msg(
+		[
+			['reg','int32'],
+			['chkCode','int32'],
+			['iType','int32'],
+			['bMonitor', 'bool'],
+			['workPath','string',10],
+			['processID','uint32'],
+			['testObj','object', msg_def.msgHead], // nested other
+			['testint64','int64']
+		]
+		);
+
+	var buff = msg.encodeMsg( {
+			reg     : 2,
+			chkCode : 0,
+			iType   : 2,
+			bMonitor : false,
+			workPath : 'no 你 work',
+			processID : 1234,
+			
+			testObj  :{
+				mainType : 0x01020304,
+				subType  : 0x0A0B0C0D
+			},
+			
+			testint64 : 0xCDEF
+		}  );
+
+	console.log( buff );
+
+	var data = msg.decodeMsg( buff );
+	console.log( data );
+
+
+### stream mode
+
+	msg.push_int32(2);  // reg
+	msg.push_int32(0);  // chkCode
+	msg.push_int32(2);  // iType
+
+	msg.push_uint8(0);  // bMonitor
+	msg.push_string('no worker path',10);
+	msg.push_string('no worker path',20);
+	msg.push_string('brnn-20',20);
+	msg.push_uint32( 1234 ); // processID
+
+	console.log( msg.encode());
+
+
+## LICENSE
+
+The MIT License (MIT)
+
+Copyright (c) 2016 Shudingbo
+
