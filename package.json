@@ -1,6 +1,6 @@
 {
   "name": "cppMsg",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "encode/decode binary data struct for json",
   "main": "cppMsg.js",
   "scripts": {
@@ -11,6 +11,19 @@
     "data",
     "struct"
   ],
-  "author": "shudingbo",
-  "license": "MIT"
+  "author": {
+	"name":"shudingbo",
+	"email":"shudingbo@qq.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "iconv-lite": "~0.4.13"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shudingbo/node-cppMsg.git"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
 }

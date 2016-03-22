@@ -19,7 +19,7 @@
 
 
 var cppMsg = module.exports;
-
+var iconv = require('iconv-lite');
 
 
 ///////////// cppString defined
@@ -233,10 +233,18 @@ cppMsg.msg.prototype.phraseDS = function( ds ){
                     throw Error(' cppType.msg ds phrase error ');
                 }else{
                     if( dataType === DataType.string ){  // 字符串
-                        if( it.length !== 3 ) {
+                        if( it.length < 3 ) {
                             throw Error(' cppType.msg ds phrase error: [string] ');
                         }
                         dataLen = parseInt( it[2] );
+						
+						if( it.length === 4 ){
+							deAddin=it[3];
+							enAddin=it[3];
+						}else{
+							enAddin='gb2312';
+							deAddin='gb2312';
+						}
                     }
                     else if( dataType === DataType.object ){ // 对象
                         dataLen = -1;
@@ -397,7 +405,8 @@ function decodeObject(buf, offset,dsDecode){
             break;
             case DataType.string:
             {
-                data[key]  = buf.toString(undefined, off, off+info[1]-1 );
+                //data[key]  = buf.toString(undefined, off, off+info[1]-1 );
+				data[key]= iconv.decode(buf.slice(off, off+info[1]-1),'gb2312');
             }
             break;
             case DataType.object:
@@ -464,12 +473,12 @@ function encodeObject( data, dsLen, dsEncode ){
                 var strLen = keyInfo[2];
                 var str = '';
                 if(data[p].length > strLen-1){
-                    str = data[p].slice(0,strLen-1);
+                    str = iconv.encode(data[p].slice(0,strLen-1),keyInfo[3] );
                 }else{
-                    str = data[p];
+                    str = iconv.encode(data[p],keyInfo[3] );
                 }
 
-                msgBuf.write( str, keyInfo[1] );
+				str.copy( msgBuf,keyInfo[1] );
             }
             break;
             case DataType.object:

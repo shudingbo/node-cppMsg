@@ -18,7 +18,7 @@ var msg = new cppMsg.msg(
         ['chkCode','int32'],
         ['iType','int32'],
         ['bMonitor', 'bool'],
-        ['workPath','string',10],
+        ['workPath','string',10,'gb2312'],
         ['processID','uint32'],
         ['testObj','object', msg_def.msgHead],
         ['testint64','int64']

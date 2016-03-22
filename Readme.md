@@ -1,4 +1,4 @@
-# HashMap Class for JavaScript
+# Binary data structure transformation for JavaScript
 
 ## Installation
 
@@ -23,7 +23,7 @@ This module provides follow function:
   - support msg nested;
   
   You can phrase C++ binary data sturct from network to json.
-  
+  Note: c/c++ data struct must one bit algin.  
 
 ## cppMsg.msg constructor overloads
 - `new cppMsg.msg() create empty cppMsg;
@@ -109,7 +109,14 @@ Assume this for all examples below
 
 	console.log( msg.encode());
 
+## Changelog
+### 1.0.1
+   1. string type add encode support(using iconv-lite). 
 
+### 1.0.0
+   1. init.
+   
+   
 ## LICENSE
 
 The MIT License (MIT)
