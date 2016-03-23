@@ -1,5 +1,5 @@
 {
-  "name": "cppMsg",
+  "name": "cppmsg",
   "version": "1.0.1",
   "description": "encode/decode binary data struct for json",
   "main": "cppMsg.js",
