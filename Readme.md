@@ -6,10 +6,6 @@ Using npm:
 
     $ npm install cppMsg
 
-You can download the last stable version from the [releases page](https://github.com/flesler/hashmap/releases).
-
-If you like risk, you can download the [latest master version](https://raw.github.com/flesler/hashmap/master/hashmap.js), it's usually stable.
-
 To run the tests:
 
     $ node test.js
