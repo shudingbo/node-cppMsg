@@ -45,7 +45,25 @@ next methods using stream mode:
 
 ### Normal Mode
 Assume this for all examples below
+```c++
+//Must one byte algin
+struct head{
+	int mainType;
+    int subType;
+};
 
+struct msg{
+	int reg;
+    int chkCode;
+    int iType;
+    bool bMonitor;
+    char workPath[10];
+    unsigned int processID;
+    struct head testObj;
+    long long testin64;
+};
+```
+```js
 	var cppMsg = require('./cppMsg.js');
 
 	var msg_def = {
@@ -76,12 +94,10 @@ Assume this for all examples below
 			bMonitor : false,
 			workPath : 'no 你 work',
 			processID : 1234,
-			
 			testObj  :{
 				mainType : 0x01020304,
 				subType  : 0x0A0B0C0D
 			},
-			
 			testint64 : 0xCDEF
 		}  );
 
@@ -89,10 +105,10 @@ Assume this for all examples below
 
 	var data = msg.decodeMsg( buff );
 	console.log( data );
-
+```
 
 ### stream mode
-
+```js
 	msg.push_int32(2);  // reg
 	msg.push_int32(0);  // chkCode
 	msg.push_int32(2);  // iType
@@ -104,7 +120,7 @@ Assume this for all examples below
 	msg.push_uint32( 1234 ); // processID
 
 	console.log( msg.encode());
-
+```
 ## Changelog
 ### 1.0.1
    1. string type add encode support(using iconv-lite). 
