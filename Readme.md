@@ -45,8 +45,10 @@ next methods using stream mode:
 
 ### Normal Mode
 Assume this for all examples below
+
+C++ Code:
 ```c++
-//Must one byte algin
+//C++ struct define Must one byte algin
 struct head{
 	int mainType;
     int subType;
@@ -63,6 +65,7 @@ struct msg{
     long long testin64;
 };
 ```
+Nodejs code:
 ```js
 	var cppMsg = require('./cppMsg.js');
 
