@@ -63,6 +63,7 @@ struct msg{
     unsigned int processID;
     struct head testObj;
     long long testin64;
+    float floatArray3[3];
 };
 ```
 Nodejs code:
@@ -86,7 +87,8 @@ Nodejs code:
 			['workPath','string',10],
 			['processID','uint32'],
 			['testObj','object', msg_def.msgHead], // nested other
-			['testint64','int64']
+			['testint64','int64'],
+			['floatArray3', 'float', , , 3]
 		]
 		);
 
@@ -101,7 +103,8 @@ Nodejs code:
 				mainType : 0x01020304,
 				subType  : 0x0A0B0C0D
 			},
-			testint64 : 0xCDEF
+			testint64 : 0xCDEF,
+			floatArray3: [1.1, 2.2, 9.7]
 		}  );
 
 	console.log( buff );
@@ -125,6 +128,9 @@ Nodejs code:
 	console.log( msg.encode());
 ```
 ## Changelog
+### 1.0.2
+   1. added support for arrays of each supported type.
+
 ### 1.0.1
    1. string type add encode support(using iconv-lite). 
 

@@ -5,25 +5,27 @@
 var cppMsg = require('./cppMsg.js');
 
 var msg_def = {
-    msgHead:[
-                ['mainType','int32'],
-                ['subType', 'int32']
-            ]
+    msgHead: [
+        ['mainType', 'int32'],
+        ['subType', 'int32']
+    ]
 };
 
 
 var msg = new cppMsg.msg(
     [
-        ['reg','int32'],
-        ['chkCode','int32'],
-        ['iType','int32'],
+        ['reg', 'int32'],
+        ['chkCode', 'int32'],
+        ['iType', 'int32'],
         ['bMonitor', 'bool'],
-        ['workPath','string',10,'gb2312'],
-        ['processID','uint32'],
-        ['testObj','object', msg_def.msgHead],
-        ['testint64','int64']
+        ['workPath', 'string', 10, 'gb2312'],
+        ['processID', 'uint32'],
+        ['testObj', 'object', msg_def.msgHead],
+        ['testint64', 'int64'],
+        ['floatArray3', 'float', , , 3],
+        ['alert', 'string', 10, 'gb2312', 2]
     ]
-    );
+);
 //msg.push_int32(2);  // reg
 //msg.push_int32(0);  // chkCode
 //msg.push_int32(2);  // iType
@@ -41,23 +43,29 @@ var msg = new cppMsg.msg(
 //msg.push_uint32( 14 ); // port
 //msg.push_uint32( 12340 ); // uParentIP
 
-var buff = msg.encodeMsg( {
-        reg     : 2,
-        chkCode : 0,
-        iType   : 2,
-        bMonitor : false,
-        workPath : 'no 你 work',
-        processID : 1234,
-        
-        testObj  :{
-            mainType : 0x01020304,
-            subType  : 0x0A0B0C0D
-        },
-        
-        testint64 : 0xCDEF
-    }  );
+var buff = msg.encodeMsg({
+    reg: 2,
+    chkCode: 0,
+    iType: 2,
+    bMonitor: false,
+    workPath: 'no 你 work',
+    processID: 1234,
 
-console.log( buff );
+    testObj: {
+        mainType: 0x01020304,
+        subType: 0x0A0B0C0D
+    },
 
-var data = msg.decodeMsg( buff );
-console.log( data );
+    testint64: 0xCDEF,
+    floatArray3: [1.1, 2.2, 9.7],
+    alert: ['quick fox', 'lazy dog']
+});
+
+console.log(buff);
+
+// var foo = 1;
+// if(!Array.isArray(foo)) foo = [foo];
+// foo.map(console.log);
+
+var data = msg.decodeMsg(buff);
+console.log(data);
