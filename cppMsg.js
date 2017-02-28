@@ -18,6 +18,9 @@
 
  * Modified by darnold79 on 2/14/17
  * Added support for arrays of any supported data type.
+
+ * Modified by darnold79 on 2/28/17
+ * Added support for dynamic array length (if specified as last element in struct).
  */
 
 
@@ -416,6 +419,7 @@ function decodeObject(buf, offset, dsDecode) {
         var arrayLen = info[5];
         var values = [];
         for (var arri = 0; arri < arrayLen; arri++) {
+            if(off >= buf.length) continue;
             switch (info[2]) {
                 case DataType.int8:
                     values.push(buf.readInt8(off));
