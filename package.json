@@ -1,7 +1,7 @@
 {
-  "name": "cppmsg",
-  "version": "1.0.1",
-  "description": "encode/decode binary data struct for json",
+  "name": "cppmsg-dynamic",
+  "version": "1.0.0",
+  "description": "C++ stuct encoding/decoding with support for (dynamic) arrays. Fork of node-cppMsg.",
   "main": "cppMsg.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,8 +12,8 @@
     "struct"
   ],
   "author": {
-	"name":"shudingbo",
-	"email":"shudingbo@qq.com"
+	"name":"darnold79",
+	"email":"npm@darnold.org"
   },
   "license": "MIT",
   "dependencies": {
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shudingbo/node-cppMsg.git"
+    "url": "https://github.com/darnold79/node-cppMsg-dynamic.git"
   },
   "engines": {
     "node": ">=0.8.0"
