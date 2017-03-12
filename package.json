@@ -1,7 +1,7 @@
 {
   "name": "cppmsg-dynamic",
-  "version": "1.0.0",
-  "description": "C++ stuct encoding/decoding with support for (dynamic) arrays. Fork of node-cppMsg.",
+  "version": "1.0.2",
+  "description": "C++ stuct encoding/decoding with support for (dynamic) arrays.",
   "main": "cppMsg.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,16 +12,20 @@
     "struct"
   ],
   "author": {
-	"name":"darnold79",
-	"email":"npm@darnold.org"
+    "name":"darnold79",
+    "email":"npm@darnold.org"
   },
+  "contributors":[{
+    "name":"darnold79",
+	"email":"npm@darnold.org"
+  }],
   "license": "MIT",
   "dependencies": {
     "iconv-lite": "~0.4.13"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/darnold79/node-cppMsg-dynamic.git"
+	"url":"https://github.com/shudingbo/node-cppMsg.git"
   },
   "engines": {
     "node": ">=0.8.0"
