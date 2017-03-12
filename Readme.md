@@ -1,10 +1,11 @@
 # Binary data structure transformation for JavaScript
+## Forked from node-cppMsg because it lacked support for arrays.
 
 ## Installation
 
 Using npm:
 
-    $ npm install cppMsg
+    $ npm install cppMsg-dynamic
 
 To run the tests:
 
@@ -63,6 +64,7 @@ struct msg{
     unsigned int processID;
     struct head testObj;
     long long testin64;
+    float floatArray3[3];
 };
 ```
 Nodejs code:
@@ -86,7 +88,8 @@ Nodejs code:
 			['workPath','string',10],
 			['processID','uint32'],
 			['testObj','object', msg_def.msgHead], // nested other
-			['testint64','int64']
+			['testint64','int64'],
+			['floatArray3', 'float', , , 3]
 		]
 		);
 
@@ -101,7 +104,8 @@ Nodejs code:
 				mainType : 0x01020304,
 				subType  : 0x0A0B0C0D
 			},
-			testint64 : 0xCDEF
+			testint64 : 0xCDEF,
+			floatArray3: [1.1, 2.2, 9.7]
 		}  );
 
 	console.log( buff );
@@ -125,16 +129,15 @@ Nodejs code:
 	console.log( msg.encode());
 ```
 ## Changelog
-### 1.0.1
-   1. string type add encode support(using iconv-lite). 
-
 ### 1.0.0
-   1. init.
-   
+   1. forked from node-cppMsg and added array support.
+  
    
 ## LICENSE
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Shudingbo
+Copyright (c) 2016 Shudingbo (node-cppMsg)
+Copyright (c) 2017 darnold79 (node-cppMsg-dynamic)
+
 
