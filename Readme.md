@@ -128,6 +128,9 @@ Nodejs code:
 	console.log( msg.encode());
 ```
 ## Changelog
+### 1.0.3
+   1. fix int64 decode/encode error( Works only for numbers <= Number.MAX_SAFE_INTEGER ).
+   2. fix object decode error.
 ### 1.0.2
    1. merge darnold79 change,add array support.
 

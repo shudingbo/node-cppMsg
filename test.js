@@ -56,7 +56,7 @@ var buff = msg.encodeMsg({
         subType: 0x0A0B0C0D
     },
 
-    testint64: 0xCDEF,
+    testint64: 8888321499136,
     floatArray3: [1.1, 2.2, 9.7],
     alert: ['quick fox', 'lazy dog']
 });

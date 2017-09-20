@@ -403,7 +403,6 @@ function readFunc(f, arrayLen, off, datalen) {
             off += datalen;
         }
     return res;
-    d
 }
 
 function decodeObject(buf, offset, dsDecode) {
@@ -415,7 +414,7 @@ function decodeObject(buf, offset, dsDecode) {
     for (i = 0; i < len; i++) {
         info = dsDecode[i];
         off = info[0] + offset;
-        key = info[3];
+        var key = info[3];
         var arrayLen = info[5];
         var values = [];
         for (var arri = 0; arri < arrayLen; arri++) {
@@ -433,7 +432,7 @@ function decodeObject(buf, offset, dsDecode) {
                 case DataType.int64:
                     var high = buf.readUInt32LE(off);
                     var low = buf.readUInt32LE(off + 4);
-                    values.push((high << 8) | low);
+                    values.push(low * 0x100000000 + high);
                     break;
                 case DataType.uint8:
                     values.push(buf.readUInt8(off));
@@ -456,7 +455,8 @@ function decodeObject(buf, offset, dsDecode) {
                     break;
                 case DataType.string: {
                     //values  = buf.toString(undefined, off, off+info[1]-1 );
-                    values.push(iconv.decode(buf.slice(off, off + info[1] - 1), 'gb2312'));
+                    var val = iconv.decode(buf.slice(off, off + info[1] - 1), info[4]);
+                    values.push(val.replace(/\0[\s\S]*/g, ''));
                 }
                     break;
                 case DataType.object: {
@@ -499,9 +499,11 @@ function encodeObject(data, dsLen, dsEncode) {
                     msgBuf.writeInt32LE(x, off);
                     break;
                 case DataType.int64:
-                    msgBuf.writeUInt32LE(x >> 8, off); //write the high order bits (shifted over)
-                    off += 4;
-                    msgBuf.writeUInt32LE(x & 0x00ff, off); //write the low order bits
+                    let high = ~~(x / 0xFFFFFFFF);
+                    let low = (x % 0xFFFFFFFF) - high;
+
+                    msgBuf.writeUInt32LE(low, off);
+                    msgBuf.writeUInt32LE(high, (off+4));
                     break;
                 case DataType.uint8:
                     msgBuf.writeUInt8(x, off);
@@ -544,8 +546,3 @@ function encodeObject(data, dsLen, dsEncode) {
 
     return msgBuf;
 }
-
-
-
-
-

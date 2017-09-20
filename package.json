@@ -1,6 +1,6 @@
 {
   "name": "cppmsg",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "C++ stuct encoding/decoding with support for (dynamic) arrays.",
   "main": "cppMsg.js",
   "scripts": {
