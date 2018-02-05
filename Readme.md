@@ -128,6 +128,10 @@ Nodejs code:
 	console.log( msg.encode());
 ```
 ## Changelog
+### 1.1.0
+   1. Using ES6 syntax
+   2. optimize performance encodeMsg
+
 ### 1.0.3
    1. fix int64 decode/encode error( Works only for numbers <= Number.MAX_SAFE_INTEGER ).
    2. fix object decode error.

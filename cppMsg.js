@@ -24,8 +24,8 @@
  */
 
 
-var cppMsg = module.exports;
-var iconv = require('iconv-lite');
+let cppMsg = module.exports;
+const iconv = require('iconv-lite');
 
 
 ///////////// cppString defined
@@ -40,7 +40,7 @@ function CppString(str, len) {
     this.str += "\0";
 
     this.byteLen = len;
-    this.buffer = new Buffer(this.byteLen);
+    this.buffer = Buffer.alloc(this.byteLen);
     this.length = this.buffer.length;
 
     this.process();
@@ -58,7 +58,7 @@ CppString.prototype.getLength = function () {
 CppString.prototype.process = function () {
     this.buffer.fill(0);
     this.buffer.write(this.str);
-    /*for(var i=this.str.length;i < this.buffer.length;i++){
+    /*for(let i=this.str.length;i < this.buffer.length;i++){
      this.buffer[i] = 0x00;
      }*/
 };
@@ -109,8 +109,7 @@ function CppNum(num, intType) {
 CppNum.prototype.process = function () {
 
     this.value = this.numArray[0];
-    this.buffer = new Buffer(this.byteLen);
-    this.buffer.fill(0);//clear all the buffer
+    this.buffer = Buffer.alloc(this.byteLen);
 
     switch (this.intType) {
         case "uint8"://uint8
@@ -137,17 +136,13 @@ CppNum.prototype.process = function () {
 };
 
 
-function isArray(obj) {
-    return (Object.prototype.toString.call(obj) === '[object Array]');
-}
-
 function isObject(obj) {
     return (Object.prototype.toString.call(obj) === '[object Object]');
 }
 
 
 // 基本数据类型定义
-var DataType = {
+const DataType = {
     int8: 0,
     uint8: 1,
     int16: 2,
@@ -162,7 +157,7 @@ var DataType = {
     object: 11
 };
 
-var DataTypeLen = [1, 1, 2, 2, 4, 4, 8, 4, 8, 1, 0];
+const DataTypeLen = [1, 1, 2, 2, 4, 4, 8, 4, 8, 1, 0];
 
 /**
  ds = [{<name>:[<type>,[len],[arraylen]]}]
@@ -181,7 +176,7 @@ cppMsg.msg = function (ds, data) {
     this.dsDecode = [];  // 解码使用的结构 [<offset>,<datalen>,<dataType>,<name>]
     this.dsLen = 0;
 
-    var ret = this.phraseDS(ds);
+    const ret = this.phraseDS(ds);
     if (ret !== false) {
         this.dsLen = ret[0];
         this.dsEncode = ret[1];
@@ -200,23 +195,22 @@ cppMsg.msg = function (ds, data) {
 };
 
 cppMsg.msg.prototype.phraseDS = function (ds) {
-    if (isArray(ds)) {
-        var len = ds.length;
-        var offset = 0;
-        var i = 0;
-        var it = null;
-        var dataType = DataType.int8;
-        var dataLen = 1;
-        var arrayLen = 1;
+    if (Array.isArray(ds)) {
+        let len = ds.length;
+        let offset = 0;
+        let it = null;
+        let dataType = DataType.int8;
+        let dataLen = 1;
+        let arrayLen = 1;
 
-        var dsLen = 0;
-        var dsEncode = {};  // 编码使用结构 { name:[<dataType>,<offset>,[len]] }
-        var dsDecode = [];  // 解码使用的结构 [<offset>,<datalen>,<dataType>,<name>]
+        let dsLen = 0;
+        let dsEncode = {};  // 编码使用结构 { name:[<dataType>,<offset>,[len]] }
+        let dsDecode = [];  // 解码使用的结构 [<offset>,<datalen>,<dataType>,<name>]
 
-        for (i = 0; i < len; i++) {
-            var it = ds[i];
+        for (let i = 0; i < len; i++) {
+            let it = ds[i];
 
-            if (isArray(it) && it.length >= 2) {
+            if (Array.isArray(it) && it.length >= 2) {
                 switch (it[1]) {
                     case 'int8' :
                         dataType = DataType.int8;
@@ -259,8 +253,8 @@ cppMsg.msg.prototype.phraseDS = function (ds) {
                         break;
                 }
 
-                var enAddin = null;
-                var deAddin = null;
+                let enAddin = null;
+                let deAddin = null;
                 if (dataType === -1) {
                     throw Error(' cppType.msg ds phrase error ');
                 } else {
@@ -280,7 +274,7 @@ cppMsg.msg.prototype.phraseDS = function (ds) {
                     }
                     else if (dataType === DataType.object) { // 对象
                         dataLen = -1;
-                        var ret = this.phraseDS(it[2]);
+                        let ret = this.phraseDS(it[2]);
                         if (ret !== false) {
                             //console.log('ret-------- testObj', ret );
                             dataLen = ret[0];
@@ -318,49 +312,49 @@ cppMsg.msg.prototype.phraseDS = function (ds) {
 
 
 cppMsg.msg.prototype.push_uint8 = function (value) {
-    var uint8Value = new CppNum(value, "uint8");
+    let uint8Value = new CppNum(value, "uint8");
     this.listBuffer.push(uint8Value.buffer);
     this.length += uint8Value.byteLen;
 };
 
 cppMsg.msg.prototype.push_int8 = function (value) {
-    var int8Value = new CppNum(value, "int8");
+    let int8Value = new CppNum(value, "int8");
     this.listBuffer.push(int8Value.buffer);
     this.length += int8Value.byteLen;
 };
 
 cppMsg.msg.prototype.push_uint16 = function (value) {
-    var uint16Value = new CppNum(value, "uint16");
+    let uint16Value = new CppNum(value, "uint16");
     this.listBuffer.push(uint16Value.buffer);
     this.length += uint16Value.byteLen;
 };
 
 cppMsg.msg.prototype.push_int16 = function (value) {
-    var int16Value = new CppNum(value, "int16");
+    let int16Value = new CppNum(value, "int16");
     this.listBuffer.push(int16Value.buffer);
     this.length += int16Value.byteLen;
 };
 
 cppMsg.msg.prototype.push_uint32 = function (value) {
-    var uint32Value = new CppNum(value, "uint32");
+    let uint32Value = new CppNum(value, "uint32");
     this.listBuffer.push(uint32Value.buffer);
     this.length += uint32Value.byteLen;
 };
 
 cppMsg.msg.prototype.push_int32 = function (value) {
-    var int32Value = new CppNum(value, "int32");
+    let int32Value = new CppNum(value, "int32");
     this.listBuffer.push(int32Value.buffer);
     this.length += int32Value.byteLen;
 };
 
 cppMsg.msg.prototype.push_string = function (strValue, len) {
-    var strValue1 = new CppString(strValue, len);
+    let strValue1 = new CppString(strValue, len);
     this.listBuffer.push(strValue1.buffer);
     this.length += strValue1.byteLen;
 };
 
 cppMsg.msg.prototype.push_char = function (strChar) {
-    var strValue = new CppString(strValue, 2);
+    let strValue = new CppString(strValue, 2);
     this.listBuffer.push(strValue.buffer);
     this.length += strValue.byteLen;
 };
@@ -368,7 +362,7 @@ cppMsg.msg.prototype.push_char = function (strChar) {
 cppMsg.msg.prototype.encode = function (data) {
 
     if (isObject(data)) {
-        var msgBuf = this.encodeMsg(data);
+        let msgBuf = this.encodeMsg(data);
         this.listBuffer.push(msgBuf);
         this.length += this.listBuffer.length;
     }
@@ -394,11 +388,11 @@ cppMsg.msg.prototype.encodeMsg = function (data) {
 }
 
 function readFunc(f, arrayLen, off, datalen) {
-    var res = [];
+    let res = [];
     if (arrayLen <= 1)
         res = f(off);
     else
-        for (var i = 0; i < arrayLen; i++) {
+        for (let i = 0; i < arrayLen; i++) {
             res.push(f(off));
             off += datalen;
         }
@@ -406,18 +400,16 @@ function readFunc(f, arrayLen, off, datalen) {
 }
 
 function decodeObject(buf, offset, dsDecode) {
-    var data = {};
+    let data = {};
     // [<offset>,<datalen>,<dataType>,<name>]
-    var len = dsDecode.length;
-    var i = 0, off = 0;
-    var info = null;
-    for (i = 0; i < len; i++) {
-        info = dsDecode[i];
-        off = info[0] + offset;
-        var key = info[3];
-        var arrayLen = info[5];
-        var values = [];
-        for (var arri = 0; arri < arrayLen; arri++) {
+    let len = dsDecode.length;
+    for (let i = 0; i < dsDecode.length; i++) {
+        let info = dsDecode[i];
+        let off = info[0] + offset;
+        let key = info[3];
+        let arrayLen = info[5];
+        let values = [];
+        for (let arri = 0; arri < arrayLen; arri++) {
             if(off >= buf.length) continue;
             switch (info[2]) {
                 case DataType.int8:
@@ -430,8 +422,8 @@ function decodeObject(buf, offset, dsDecode) {
                     values.push(buf.readInt32LE(off));
                     break;
                 case DataType.int64:
-                    var high = buf.readUInt32LE(off);
-                    var low = buf.readUInt32LE(off + 4);
+                    let high = buf.readUInt32LE(off);
+                    let low = buf.readUInt32LE(off + 4);
                     values.push(low * 0x100000000 + high);
                     break;
                 case DataType.uint8:
@@ -455,7 +447,7 @@ function decodeObject(buf, offset, dsDecode) {
                     break;
                 case DataType.string: {
                     //values  = buf.toString(undefined, off, off+info[1]-1 );
-                    var val = iconv.decode(buf.slice(off, off + info[1] - 1), info[4]);
+                    let val = iconv.decode(buf.slice(off, off + info[1] - 1), info[4]);
                     values.push(val.replace(/\0[\s\S]*/g, ''));
                 }
                     break;
@@ -473,21 +465,20 @@ function decodeObject(buf, offset, dsDecode) {
 }
 
 function encodeObject(data, dsLen, dsEncode) {
-    var key = '';
-    var keyInfo = null;
+    let keyInfo = null;
+    let msgBuf = Buffer.alloc(dsLen);
 
-    var msgBuf = new Buffer(dsLen);
-    msgBuf.fill(0);
-
-    for (var p in data) {
-        key = p;
-        keyInfo = dsEncode[key]; // { name:[<dataType>,<offset>,[len],[arraylen]] }
+    for (let p in data) {
+        keyInfo = dsEncode[p]; // { name:[<dataType>,<offset>,[len],[arraylen]] }
         if (keyInfo === undefined) {
             continue;
         }
-        var out = Array.isArray(data[p]) ? data[p] : [data[p]];
-        var off = keyInfo[1];
-        out.map(function (x) {
+        let out = Array.isArray(data[p]) ? data[p] : [data[p]];
+        let off = keyInfo[1];
+
+        for(let idx=0; idx< out.length;idx++)
+        {
+            let x = out[idx];
             switch (keyInfo[0]) {
                 case DataType.int8:
                     msgBuf.writeInt8(x, off);
@@ -524,8 +515,8 @@ function encodeObject(data, dsLen, dsEncode) {
                     msgBuf.writeUInt8(x ? 1 : 0, off);
                     break;
                 case DataType.string:
-                    var strLen = keyInfo[2];
-                    var str = '';
+                    let strLen = keyInfo[2];
+                    let str = '';
                     if (x.length > strLen - 1) {
                         str = iconv.encode(x.slice(0, strLen - 1), keyInfo[3]);
                     } else {
@@ -536,12 +527,12 @@ function encodeObject(data, dsLen, dsEncode) {
                     break;
                 case
                 DataType.object:
-                    var tmpBuf = encodeObject(x, keyInfo[2], keyInfo[3]);
+                    let tmpBuf = encodeObject(x, keyInfo[2], keyInfo[3]);
                     tmpBuf.copy(msgBuf, off, 0, keyInfo[2]);
                     break;
             }
             off += keyInfo[2];
-        })
+        }
     }
 
     return msgBuf;
