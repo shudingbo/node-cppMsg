@@ -4,7 +4,7 @@
 
 Using npm:
 
-    $ npm install cppMsg
+    $ npm install cppmsg
 
 To run the tests:
 
