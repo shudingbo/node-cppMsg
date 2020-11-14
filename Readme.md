@@ -22,12 +22,15 @@ This module provides follow function:
   Note: c/c++ data struct must one bit algin.  
 
 ## cppMsg.msg constructor overloads
-- `new cppMsg.msg() create empty cppMsg;
-- `new cppMsg.msg( ds ) ds is data struct define Array
-- `new cppMsg.msg( ds, data) ds is data struct define Array. data(optional) is init json data. 
+- `new cppMsg.msg()` create empty cppMsg;
+- `new cppMsg.msg( ds )` ds is data struct define Array
+- `new cppMsg.msg( ds, data)` ds is data struct define Array. data(optional) is init json data.
+- `new cppMsg.msg( ds, null, opts)` ds is data struct define Array. data(optional) is init json data. 
+  * opts, {useIconv: true } ,useIconv `boolean`,  maybe use iconv-lite convert code
 
 ## cppMsg.msg methods
 - encodeMsg( data ) : json data object;
+- encodeMsg2( data ) : json data object( use msg internal buffer, return internal buffer ); 
 - decodeMsg( buf )  : decode Buffer to json data object; 
 
 next methods using stream mode:
@@ -89,10 +92,10 @@ Nodejs code:
 			['testObj','object', msg_def.msgHead], // nested other
 			['testint64','int64'],
 			['floatArray3', 'float', , , 3]
-		]
+		],null, {useIconv: false}
 		);
 
-	var buff = msg.encodeMsg( {
+	var buff = msg.encodeMsg2( {
 			reg     : 2,
 			chkCode : 0,
 			iType   : 2,
@@ -128,21 +131,30 @@ Nodejs code:
 	console.log( msg.encode());
 ```
 ## Changelog
+### 1.2.0
+ 1. add method `encodeMsg2`, Improve performance 1x
+ 1. optimize performance encodeMsg
+ 1. optimize performance decodeMsg, Improve performance 1x
+ 1. change msg construct add params `opts`
+	* opts, `{useIconv: true }`
+		* useIconv, `boolean`, true(default): use iconv-lite convert code.( false, __Improve performance__)
+ 1. Default string code,change to `utf8`
+
 ### 1.1.0
-   1. Using ES6 syntax
-   2. optimize performance encodeMsg
+ 1. Using ES6 syntax
+ 2. optimize performance encodeMsg
 
 ### 1.0.3
-   1. fix int64 decode/encode error( Works only for numbers <= Number.MAX_SAFE_INTEGER ).
-   2. fix object decode error.
+ 1. fix int64 decode/encode error( Works only for numbers <= Number.MAX_SAFE_INTEGER ).
+ 2. fix object decode error.
 ### 1.0.2
-   1. merge darnold79 change,add array support.
+ 1. merge darnold79 change,add array support.
 
 ### 1.0.1
-   1. string type add encode support(using iconv-lite). 
+ 1. string type add encode support(using iconv-lite). 
 
 ### 1.0.0
-   1. init.
+ 1. init.
    
    
 ## LICENSE
