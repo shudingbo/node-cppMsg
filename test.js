@@ -3,7 +3,7 @@
  */
 
 const cppMsg = require('./cppMsg.js');
-let testCnt = 10000000;
+let testCnt = 100000;
 let testEncode = true;
 let testDecode = true;
 
@@ -88,8 +88,11 @@ let msg = new cppMsg.msg(
     null, {useIconv: false}
 );
 
+let sz = ['123', '452kjads', 'lkrtq','hhwerqt','quick fox', 'lazy dog']
+
 if( testEncode === true ) {
     sTime = Date.now();
+    let szIdx = 0;
     for( let i=0;i<testCnt;i++ )
     {
         //msg.push_int32(2);  // reg
@@ -109,6 +112,10 @@ if( testEncode === true ) {
         //msg.push_uint32( 14 ); // port
         //msg.push_uint32( 12340 ); // uParentIP
 
+        let str = sz[szIdx++];
+        if( szIdx >= sz.length ) {
+            szIdx = 0;
+        } 
         let buff = msg.encodeMsg({
             reg: testCnt,
             chkCode: 0,
@@ -123,7 +130,7 @@ if( testEncode === true ) {
 
             testint64: 8888321499136,
             floatArray3: [1.1, 2.2, 9.7],
-            alert: ['quick fox', 'lazy dog']
+            alert: ['quick fox', str]
         });
 
         //let data = msg.decodeMsg(buff);
@@ -133,6 +140,7 @@ if( testEncode === true ) {
 
     if( msg.encodeMsg2 ){
         sTime = Date.now();
+        let szIdx = 0;
         for( let i=0;i<testCnt;i++ )
         {
             //msg.push_int32(2);  // reg
@@ -152,6 +160,10 @@ if( testEncode === true ) {
             //msg.push_uint32( 14 ); // port
             //msg.push_uint32( 12340 ); // uParentIP
 
+            let str = sz[szIdx++];
+            if( szIdx >= sz.length ) {
+                szIdx = 0;
+            } 
             let buff = msg.encodeMsg2({
                 reg: testCnt,
                 chkCode: 0,
@@ -167,7 +179,7 @@ if( testEncode === true ) {
 
                 testint64: 8888321499136,
                 floatArray3: [1.1, 2.2, 9.7],
-                alert: ['quick fox', 'lazy dog']
+                alert: ['quick fox', str]
             });
         }
         console.log(`encode2 ${testCnt} Test: consume time ${Date.now() - sTime} ms`);

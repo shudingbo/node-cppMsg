@@ -39,7 +39,7 @@ class CppString {
         this.str += "\0";
     
         this.byteLen = len;
-        this.buffer = Buffer.alloc(this.byteLen);
+        this.buffer = Buffer.allocUnsafe(this.byteLen);
         this.length = this.buffer.length;
     
         this.process(); 
@@ -108,7 +108,7 @@ class CppNum {
     
     process () {
         this.value = this.numArray[0];
-        this.buffer = Buffer.alloc(this.byteLen);
+        this.buffer = Buffer.allocUnsafe(this.byteLen);
     
         switch (this.intType) {
             case DataType.uint8://uint8
@@ -194,7 +194,7 @@ class msg {
             this.dsDecode = ret[2];
         }
     
-        this.encodeBuf = Buffer.alloc(this.dsLen);
+        this.encodeBuf = Buffer.allocUnsafe(this.dsLen);
     
         if (isObject(data)) {
             this.encodeMsg(data);
@@ -343,35 +343,47 @@ class msg {
 
 
     /** decode message as object
-     * @param {Buffer} buf data buffer
+     * @param {buffer} buf data buffer
+     * @param {number} offset the data buffer offset
      * @return {object} the data object
      */
-    decodeMsg (buf) {
-        return decodeObject(buf, 0, this.dsDecode, this.opts);
+    decodeMsg (buf,offset) {
+        let off = (offset)? offset : 0;
+        return decodeObject(buf, off, this.dsDecode, this.opts);
     }
 
 
     /** encode message as Buffer 
      * @param {object} data the encode object
-     * @return {Buffer} The Buffer ( new Buffer )
+     * @return {buffer} The Buffer ( new Buffer )
     */
     encodeMsg (data) {
-        return encodeObject(data, this.dsLen, this.dsEncode, this.opts);
+        return encodeObject(data, this.dsLen, this.dsEncode, null, 0, this.opts);
     }
 
     /** encode message use internal buffer
      * @param {object} data the encode object
-     * @return {Buffer} The internal Buffer
+     * @return {buffer} The internal Buffer
     */
     encodeMsg2 (data) {
-        return encodeObject2(data, this.encodeBuf, this.dsEncode, 0, this.opts);
+        return encodeObject(data, this.dsLen, this.dsEncode, this.encodeBuf, 0, this.opts);
+    }
+
+    /** encode message to Buffer
+     * @param {object} data the encode object
+     * @param {buffer} buff the encode buffer
+     * @param {number} offset the encode buffer offset
+     * @return {buffer} The internal Buffer
+    */
+    encodeMsgToBuff (data, buff, offset) {
+        return encodeObject(data, this.dsLen, this.dsEncode, buff, offset, this.opts);
     }
 }
 
 
 /** encode msg( new Buffer)
  * 
- * @param {Buffer} buf the Buffer
+ * @param {buffer} buf the Buffer
  * @param {number} offset  the Buffer offset
  * @param {object} dsEncode encode struct 
  * @param {{useIconv：boolean}?} opts
@@ -423,7 +435,6 @@ function decodeObject(buf, offset, dsDecode,opts) {
                     values.push(buf.readUInt8(off) !== 0);
                     break;
                 case DataType.string: {
-                    //values  = buf.toString(undefined, off, off+info[1]-1 );
                     if( opts.useIconv === true ){
                         let val = iconv.decode(buf.slice(off, off + info[1] - 1), info[4]);
                         values.push(val.replace(/\0[\s\S]*/g, ''));
@@ -453,9 +464,10 @@ function decodeObject(buf, offset, dsDecode,opts) {
  * 
  * @return {Buffer} 
  */
-function encodeObject(data, dsLen, dsEncode, opt) {
+function encodeObject(data, dsLen, dsEncode, _buff, _offset, opt) {
     let keyInfo = null;
-    let msgBuf = Buffer.alloc(dsLen);
+    let msgBuf = ( _buff ) ? _buff : Buffer.allocUnsafe(dsLen);
+    let _off = ( _offset ) ? _offset : 0;
 
     for (let p in data) {
         keyInfo = dsEncode[p]; // { name:[<dataType>,<offset>,[len],[arraylen]] }
@@ -463,7 +475,7 @@ function encodeObject(data, dsLen, dsEncode, opt) {
             continue;
         }
         let out = Array.isArray(data[p]) ? data[p] : [data[p]];
-        let off = keyInfo[1];
+        let off = _off + keyInfo[1];
 
         for(let idx=0; idx< out.length;idx++)
         {
@@ -504,94 +516,25 @@ function encodeObject(data, dsLen, dsEncode, opt) {
                     msgBuf.writeUInt8(x ? 1 : 0, off);
                     break;
                 case DataType.string:
+                    let bufT = null;
                     if( opt.useIconv === true ) {
-                        iconv.encode((x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x, keyInfo[3]).copy(msgBuf, off);
+                        bufT = iconv.encode((x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x, keyInfo[3]);
                     } else {
-                        Buffer.from( (x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x ).copy(msgBuf, off);
+                        bufT = Buffer.from( (x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x );
                     }
-                    msgBuf[off + keyInfo[2]-1] = 0;
-                    break;
-                case
-                DataType.object:
-                    encodeObject2(x, msgBuf, keyInfo[3], off, opt);
-                    //encodeObject(x, keyInfo[2], keyInfo[3]).copy(msgBuf, off, 0, keyInfo[2]);
-                    break;
-            }
-            off += keyInfo[2];
-        }
-    }
-
-    return msgBuf;
-}
-
-/** encode msg use internal buff
- * 
- * @param {object} data the encode object 
- * @param {Buffer} msgBuf  the internal Buffer
- * @param {object} dsEncode encode struct 
- * @param {number} offS buffer offset 
- * @param {{useIconv：boolean}?} opt
- * 
- * @return {Buffer} internal buff
- */
-function encodeObject2(data, msgBuf, dsEncode,offS = 0, opt) {
-    let keyInfo = null;
-    for (let p in data) {
-        keyInfo = dsEncode[p]; // { name:[<dataType>,<offset>,[len],[arraylen]] }
-        if (keyInfo === undefined) {
-            continue;
-        }
-        let out = Array.isArray(data[p]) ? data[p] : [data[p]];
-        let off = keyInfo[1] + offS;
-
-        for(let idx=0; idx< out.length;idx++)
-        {
-            let x = out[idx];
-            switch (keyInfo[0]) {
-                case DataType.int8:
-                    msgBuf.writeInt8(x, off);
-                    break;
-                case DataType.int16:
-                    msgBuf.writeInt16LE(x, off);
-                    break;
-                case DataType.int32:
-                    msgBuf.writeInt32LE(x, off);
-                    break;
-                case DataType.int64:
-                    let high = ~~(x / 0xFFFFFFFF);
-                    let low = (x % 0xFFFFFFFF) - high;
-
-                    msgBuf.writeUInt32LE(low, off);
-                    msgBuf.writeUInt32LE(high, (off+4));
-                    break;
-                case DataType.uint8:
-                    msgBuf.writeUInt8(x, off);
-                    break;
-                case DataType.uint16:
-                    msgBuf.writeUInt16LE(x, off);
-                    break;
-                case DataType.uint32:
-                    msgBuf.writeUInt32LE(x, off);
-                    break;
-                case DataType.float:
-                    msgBuf.writeFloatLE(x, off);
-                    break;
-                case DataType.double:
-                    msgBuf.writeDoubleLE(x, off);
-                    break;
-                case DataType.bool:
-                    msgBuf.writeUInt8(x ? 1 : 0, off);
-                    break;
-                case DataType.string:
-                    if( opt.useIconv === true ) {
-                        iconv.encode((x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x, keyInfo[3]).copy(msgBuf, off);
+                    bufT.copy(msgBuf, off);
+                    let fillBufLen = keyInfo[2] - bufT.length;
+                    if( fillBufLen <= 20 ) {
+                        let offT = off + bufT.length;
+                        for( let i=0;i< fillBufLen; i++){
+                            msgBuf[ offT++ ] = 0;
+                        }
                     } else {
-                        Buffer.from( (x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x ).copy(msgBuf, off);
+                        msgBuf.fill(0,off + bufT.length,off + keyInfo[2] );
                     }
-                    msgBuf[off + keyInfo[2]-1] = 0;
                     break;
                 case DataType.object:
-                    encodeObject2(x, msgBuf, keyInfo[3], off, opt);
+                    encodeObject(x, keyInfo[2], keyInfo[3], msgBuf, off, opt);
                     break;
             }
             off += keyInfo[2];
@@ -600,5 +543,6 @@ function encodeObject2(data, msgBuf, dsEncode,offS = 0, opt) {
 
     return msgBuf;
 }
+
 
 module.exports = { msg, DataType };

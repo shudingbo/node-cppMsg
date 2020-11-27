@@ -29,9 +29,14 @@ This module provides follow function:
   * opts, {useIconv: true } ,useIconv `boolean`,  maybe use iconv-lite convert code
 
 ## cppMsg.msg methods
-- encodeMsg( data ) : json data object;
-- encodeMsg2( data ) : json data object( use msg internal buffer, return internal buffer ); 
-- decodeMsg( buf )  : decode Buffer to json data object; 
+- **encodeMsg( data )** : json data object;
+- **encodeMsg2( data )** : json data object( use msg internal buffer, return internal buffer );
+- **encodeMsgToBuff (data, buff, offset?)** : encode to buffer 
+  * **data**, object;
+  * **buff**, target buffer;
+	* **offset**, data offset, default `0`;
+- **decodeMsg( buf, offset? )**  : decode Buffer to json data object; 
+  * **offset**, data offset, default `0`;
 
 next methods using stream mode:
 - push_uint8
@@ -131,6 +136,11 @@ Nodejs code:
 	console.log( msg.encode());
 ```
 ## Changelog
+### 1.2.1
+ 1. Fixed encodeMsg2 using internal cache causing string dirty;
+ 1. optimize performance encodeMsg;
+ 1. add `decodeMsgFromBuff`
+
 ### 1.2.0
  1. add method `encodeMsg2`, Improve performance 1x
  1. optimize performance encodeMsg
