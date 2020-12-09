@@ -135,6 +135,11 @@ Nodejs code:
 
 	console.log( msg.encode());
 ```
+
+## contributors
+ 1. [FreeBugs](https://github.com/FreeBugs)
+ 1. [kirtanshetty](https://github.com/kirtanshetty) 
+
 ## Changelog
 ### 1.2.1
  1. Fixed encodeMsg2 using internal cache causing string dirty;
