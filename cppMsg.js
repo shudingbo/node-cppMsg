@@ -29,6 +29,11 @@ const iconv = require('iconv-lite');
 
 ///////////// cppString defined
 class CppString {
+    /**
+     * 
+     * @param {string} str  string value
+     * @param {number} len string length
+     */
     constructor( str, len ){
         this.str = "";
         if (str.length > len - 1) {
@@ -65,13 +70,20 @@ class CppString {
 
 
 class CppNum {
+    /**
+     * 
+     * @param {number} num  number value
+     * @param {number} intType  number type
+     */
     constructor(num, intType) {
         this.num = num;
-    
+        /** @type {Buffer| null} */
         this.buffer = null;
+        /** @type {number | null} */
         this.value = null;
         this.numArray = null;
-        this.byteLen = null;
+        /** @type {number } */
+        this.byteLen = 0;
         this.intType = intType;
     
         switch (this.intType) {
@@ -107,6 +119,9 @@ class CppNum {
     
     
     process () {
+        if(!this.numArray){
+            return;
+        }
         this.value = this.numArray[0];
         this.buffer = Buffer.allocUnsafe(this.byteLen);
     
@@ -137,13 +152,22 @@ class CppNum {
 
 
 
-
+/**
+ * 
+ * @param {any} obj 
+ * @returns 
+ */
 function isObject(obj) {
     return (Object.prototype.toString.call(obj) === '[object Object]');
 }
 
 
-// 基本数据类型定义
+/**
+ * 基本数据类型定义
+ * 
+ * @type {Record<string, number>}
+ * 
+ */
 const DataType = {
     int8: 0,
     uint8: 1,
@@ -161,18 +185,28 @@ const DataType = {
 
 const DataTypeLen = [1, 1, 2, 2, 4, 4, 8, 4, 8, 1, 0];
 
+/**
+ * @class msg
+ */
 class msg {
-    
+
     /**
-     ds = [{<name>:[<type>,[len],[arraylen]]}]
+     * 
+     * @param {any[]} ds 
+     * @param {object?} [data]
+     * @param {{useIconv: boolean}?} [opts] 
+     * 
+     * @example 
+     *      ds = [{<name>:[<type>,[len],[arraylen]]}]
     [
     [ 'reg','int32'],
     [ 'workPath','string',250 },
     [ 'someArray','uint32',,16 },
     ]
 
-    */
+     */
     constructor (ds, data ,opts) {
+        /** @type {Buffer[]} */
         this.listBuffer = [];  // 数据 Buffer
         this.length = 0;       // 已放入Buffer的数据长度
     
@@ -182,7 +216,7 @@ class msg {
 
         let defOpt = { useIconv: true };
 
-        this.opts = isObject(opts) ? opts : defOpt;
+        this.opts = (opts && isObject(opts)) ? opts : defOpt;
         if( this.opts.useIconv === undefined ){
             this.opts.useIconv = true;
         }
@@ -201,7 +235,11 @@ class msg {
         }
     }
 
-    
+   /**
+    * 
+    * @param {*} ds 
+    * @returns 
+    */ 
    phraseDS (ds) {
         if (Array.isArray(ds)) {
             let len = ds.length;
@@ -278,55 +316,103 @@ class msg {
         }
     }
 
-
+    /**
+     * 
+     * @param {number} value 
+     */
     push_uint8 (value) {
         let uint8Value = new CppNum(value, DataType.uint8);
-        this.listBuffer.push(uint8Value.buffer);
-        this.length += uint8Value.byteLen;
+        if( uint8Value.buffer ) {
+            this.listBuffer.push(uint8Value.buffer);
+            this.length += uint8Value.byteLen;
+        }
     }
 
+    /**
+     * 
+     * @param {number} value 
+     */
     push_int8 (value) {
         let int8Value = new CppNum(value, DataType.int8);
-        this.listBuffer.push(int8Value.buffer);
-        this.length += int8Value.byteLen;
+        if( int8Value.buffer ) {
+            this.listBuffer.push(int8Value.buffer);
+            this.length += int8Value.byteLen;
+        }
     }
-
+    /**
+     * 
+     * @param {number} value 
+     */
     push_uint16 (value) {
         let uint16Value = new CppNum(value, DataType.uint16);
-        this.listBuffer.push(uint16Value.buffer);
-        this.length += uint16Value.byteLen;
+        if( uint16Value.buffer ) {
+            this.listBuffer.push(uint16Value.buffer);
+            this.length += uint16Value.byteLen;
+        }
     }
-
+    
+    /**
+     * 
+     * @param {number} value 
+     */
     push_int16 (value) {
         let int16Value = new CppNum(value, DataType.int16);
-        this.listBuffer.push(int16Value.buffer);
-        this.length += int16Value.byteLen;
+        if( int16Value.buffer ) {
+            this.listBuffer.push(int16Value.buffer);
+            this.length += int16Value.byteLen;
+        }
     }
 
+    /**
+     * 
+     * @param {number} value 
+     */
     push_uint32 (value) {
         let uint32Value = new CppNum(value, DataType.uint32);
-        this.listBuffer.push(uint32Value.buffer);
-        this.length += uint32Value.byteLen;
+        if( uint32Value.buffer ) {
+            this.listBuffer.push(uint32Value.buffer);
+            this.length += uint32Value.byteLen;
+        }
     }
 
+    /**
+     * 
+     * @param {number} value 
+     */
     push_int32 (value) {
         let int32Value = new CppNum(value, DataType.int32);
-        this.listBuffer.push(int32Value.buffer);
-        this.length += int32Value.byteLen;
+        if( int32Value.buffer ) {
+            this.listBuffer.push(int32Value.buffer);
+            this.length += int32Value.byteLen;            
+        }
     }
 
+    /**
+     * 
+     * @param {string} strValue 
+     * @param {number} len 
+     */
     push_string (strValue, len) {
         let strValue1 = new CppString(strValue, len);
         this.listBuffer.push(strValue1.buffer);
         this.length += strValue1.byteLen;
     };
 
+    /**
+     * 
+     * @param {string} strChar 
+     */
     push_char (strChar) {
-        let strValue = new CppString(strValue, 2);
+        let strValue = new CppString(strChar, 2);
         this.listBuffer.push(strValue.buffer);
         this.length += strValue.byteLen;
     };
 
+    /**
+     * 
+     * @param {any} data 
+     * @returns 
+     */
     encode (data) {
         if (isObject(data)) {
             let msgBuf = this.encodeMsg(data);
@@ -343,9 +429,10 @@ class msg {
 
 
     /** decode message as object
-     * @param {buffer} buf data buffer
-     * @param {number} offset the data buffer offset
-     * @return {object} the data object
+     * @template T
+     * @param {Buffer} buf data buffer
+     * @param {number?} [offset=0] the data buffer offset
+     * @return {T} the data object
      */
     decodeMsg (buf,offset) {
         let off = (offset)? offset : 0;
@@ -354,26 +441,29 @@ class msg {
 
 
     /** encode message as Buffer 
-     * @param {object} data the encode object
-     * @return {buffer} The Buffer ( new Buffer )
+     * @template T
+     * @param {T} data the encode object
+     * @return {Buffer} The Buffer ( new Buffer )
     */
     encodeMsg (data) {
         return encodeObject(data, this.dsLen, this.dsEncode, null, 0, this.opts);
     }
 
     /** encode message use internal buffer
-     * @param {object} data the encode object
-     * @return {buffer} The internal Buffer
+     * @template T
+     * @param {T} data the encode object
+     * @return {Buffer} The internal Buffer
     */
     encodeMsg2 (data) {
         return encodeObject(data, this.dsLen, this.dsEncode, this.encodeBuf, 0, this.opts);
     }
 
     /** encode message to Buffer
-     * @param {object} data the encode object
-     * @param {buffer} buff the encode buffer
+     * @template T
+     * @param {T} data the encode object
+     * @param {Buffer} buff the encode buffer
      * @param {number} offset the encode buffer offset
-     * @return {buffer} The internal Buffer
+     * @return {Buffer} The internal Buffer
     */
     encodeMsgToBuff (data, buff, offset) {
         return encodeObject(data, this.dsLen, this.dsEncode, buff, offset, this.opts);
@@ -382,13 +472,14 @@ class msg {
 
 
 /** encode msg( new Buffer)
+ * @template T
  * 
- * @param {buffer} buf the Buffer
+ * @param {Buffer} buf the Buffer
  * @param {number} offset  the Buffer offset
- * @param {object} dsEncode encode struct 
- * @param {{useIconv：boolean}?} opts
+ * @param {object} dsDecode encode struct 
+ * @param {{useIconv:boolean}?} opts
  * 
- * @return {object} the decode object
+ * @return {T} the decode object
  */
 function decodeObject(buf, offset, dsDecode,opts) {
     let data = {};
@@ -457,10 +548,14 @@ function decodeObject(buf, offset, dsDecode,opts) {
 
 /** encode msg( new Buffer)
  * 
- * @param {object} data the encode object 
+ * @template T
+ * 
+ * @param {T} data the encode object 
  * @param {number} dsLen  the Buffer len
- * @param {object} dsEncode encode struct 
- * @param {{useIconv：boolean}?} opt
+ * @param {object} dsEncode encode struct
+ * @param {Buffer?} _buff the encode buffer
+ * @param {number?} _offset the encode buffer offset
+ * @param {{useIconv:boolean}?} opt
  * 
  * @return {Buffer} 
  */
@@ -517,7 +612,7 @@ function encodeObject(data, dsLen, dsEncode, _buff, _offset, opt) {
                     break;
                 case DataType.string:
                     let bufT = null;
-                    if( opt.useIconv === true ) {
+                    if( opt?.useIconv === true ) {
                         bufT = iconv.encode((x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x, keyInfo[3]);
                     } else {
                         bufT = Buffer.from( (x.length > keyInfo[2] - 1)?x.slice(0, keyInfo[2] - 1):x );

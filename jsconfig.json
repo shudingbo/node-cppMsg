@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "checkJs": true,
+    "allowJs": true,
+    "strict": true,
+    "paths": {
+      "@ntype": [
+        "node_modules/@cdyw/nrs-types"
+      ],
+      "@ntype/*": [
+        "node_modules/@cdyw/nrs-types/*"
+      ],
+      "@types": [
+        "index.d.ts"
+      ],
+      "@types/*": [
+        "./types/*.d.ts"
+      ]
+    }
+  },
+  "include": [
+    "**/*.js",
+    "**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

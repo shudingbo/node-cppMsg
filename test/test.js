@@ -2,7 +2,11 @@
  * Created by sdb on 2/25/16.
  */
 
-const cppMsg = require('./cppMsg.js');
+const cppMsg = require('../cppMsg.js');
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+
+
 let testCnt = 100000;
 let testEncode = true;
 let testDecode = true;
@@ -53,24 +57,18 @@ let testObj = {
     alert: ['quick fox', 'lazy dog']
 };
 
-let buffTest = msgTest.encodeMsg( testObj );
-let dataTestOut = msgTest.decodeMsg(buffTest);
-if(JSON.stringify(testObj) === JSON.stringify(dataTestOut)){
-    console.log('encode is equ? ', true);
-} else {
-    console.log('encode not equ', dataTestOut);
-}
+test('test encodeMsg', () => {
+    let buffTest = msgTest.encodeMsg( testObj );
+    let data = msgTest.decodeMsg(buffTest);
+    assert.deepStrictEqual(data, testObj);
+});
 
-if( msgTest.encodeMsg2 ) {
+test('test encodeMsg2', () => {
     let buffTest = msgTest.encodeMsg2( testObj );
     let dataTestOut = msgTest.decodeMsg(buffTest);
-    if(JSON.stringify(testObj) === JSON.stringify(dataTestOut)){
-        console.log('encode2 is equ? ', true);
-    } else {
-        console.log('encode2 not equ', dataTestOut);
-    }
+    assert.deepStrictEqual(dataTestOut, testObj);
 
-}
+});
 
 let msg = new cppMsg.msg(
     [
